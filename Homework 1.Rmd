@@ -1,0 +1,138 @@
+---
+title: "Homework 1"
+author: "Keshav Sriram"
+date: "2026-01-21"
+output: pdf_document
+---
+# Packages and Library
+## Call packages and relevant data
+```{r}
+# Install datasets
+library(datasets)
+data("iris")
+```
+
+# R Functions
+## Summarize and frame datasets, work with comments
+```{r}
+summary(iris)
+head(iris) # Check the top of the data frame
+
+# Check the number of rows in the full data set
+nrow(iris)
+
+# How many rows and columns are in the data frame?
+dim(iris)
+
+# Exclude rows that have missing data in ANY variable, and check the info again. Did it change?
+iris_no_NA <- na.omit(iris)
+nrow(iris_no_NA)
+dim(iris_no_NA)
+```
+
+# R Objects
+## Variables and classes
+```{r}
+# Print (but don't): iris_no_NA
+class(iris)
+```
+
+# Subsetting
+## Subsetting and making vectors
+```{r}
+species <- "setosa"
+
+# Take the entries where Species = "setosa"
+mydata <- subset(iris, Species == species)
+dim(mydata) # Check dimensions
+head(mydata) # Check top of data frame
+
+# Creating vectors
+species2 <- c("setosa","virginica") # Combine
+mydata2 <- subset(iris, Species == species2)
+dim (mydata2)
+head(mydata2)
+```
+
+# Statistics
+## Two-tailed independent samples t-test
+```{r}
+# Call the function and assign all the resulting outputs to a new object
+test.iris <- t.test(Petal.Length ~ Species, data = mydata2, conf.level = 0.95, alternative = "two.sided")
+# First entry says we are interested in petal length
+# Second entry tells function which data frame is relevant
+# Third entry creates a 95% confidence interval
+# The last entry computes a two-tailed test and interval
+test.iris
+```
+# Question 1
+```{r}
+# The calculated t value was -33.719, while the p value was < 2.2e-16
+# The 95% confidence interval was -4.331287 to -3.836713
+# The estimated mean in setosa was 1.456, while the mean in virginica was 5.540
+# These results mean that plant species has a significant impact on resulting petal length (the true difference is means between group setosa and group virginica is not equal to 0)
+```
+
+## One-way ANOVA
+```{r}
+# Tests whether petal length differs between more than two species
+# Check for the groups in the data frame
+levels(iris$Species)
+
+# Computes the analysis of variance
+test.aov <- aov(Petal.Length ~ Species , data = iris)
+
+# Summary of the analysis
+summary(test.aov)
+```
+# Question 2
+```{r}
+# The resulting p-value from the One-way ANOVA Test was 2e-16 (nearly 0)
+# This suggests that the three different plant species differ significantly based on petal length
+```
+
+## One-way MANOVA
+```{r}
+# Examines whether petal and sepal length are associated with plant species
+# c bind is used to combine dependent variables of interest in an object for later
+dep.vars <- cbind(mydata2$Sepal.Length, mydata2$Petal.Length)
+
+# Creates a MANOVA model
+iris.man <- manova(dep.vars ~ Species, data = mydata2)
+
+# Checks results
+summary(iris.man)
+```
+
+# Question 3
+```{r}
+# The resulting p-value from the MANOVA Test was 2.2e-16 (nearly 0)
+# This suggests that there is a significant associated between petal and sepal length based on plant species
+```
+
+# Plots
+```{r}
+# Checks the plot of Sepal.Length and Petal.Length for setosa and virginica
+plot(mydata2$Sepal.Length, mydata2$Petal.Length)
+
+# Checks which data points correspond to each group
+plot(mydata2$Sepal.Length, mydata2$Petal.Length, col = factor(mydata2$Species))
+
+# Adds a legend
+legend("topleft", pch = 19, legend = levels(factor(mydata2$Species)), col = factor(levels(factor(mydata2$Species))))
+
+# Check histogram for Sepal.Length
+hist(mydata2$Sepal.Length)
+```
+
+# Question 4
+```{r}
+# Plots data based on which data point belongs to which group
+plot(mydata2$Petal.Width, mydata2$Petal.Length, col = factor(mydata2$Species))
+
+# Adds a legend
+legend("topleft", pch = 19, legend = levels(factor(mydata2$Species)), col = factor(levels(factor(mydata2$Species))))
+```
+
+
+
