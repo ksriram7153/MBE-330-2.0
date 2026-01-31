@@ -1,0 +1,649 @@
+---
+title: "MorphoR"
+output:
+  pdf_document: default
+  html_notebook: default
+editor_options:
+  chunk_output_type: inline
+---
+
+**MORPHOMETRICS**   
+
+This a subset data from [Costa et al., 2016](https://doi.org/10.1111/mms.12342) 
+and it contains eight cranial measurements from 54 bottlenose dolphins of southern 
+Brazil. These bottlenose dolphins can be differentiated in two subspecies, the 
+Lahille’s bottlenose dolphin (*Tursiops truncatus gephyreus*), which inhabits 
+coastal, shallow waters, and the common bottlenose dolphin (*T. t. truncatus*), 
+which prefers deeper, open waters. The data set also contains information about 
+the gender and total body length (TBL) of each individual.   
+
+
+#Data Information  
+```{r}
+# Loads the data. 
+load("MorphoR-MBE330.rdata")
+
+head(df) # checks first few rows
+class(df) # shows the data type
+str(df) # shosw the structure
+
+summary(df) # summary statistics
+
+colnames(df) # Column names
+
+#You can investigate each variable/column separately by using df$columnname
+df$CBL
+summary(df$CBL)
+
+#The vector cbl below will contain the information regarding the variable CBL of 
+#our input file:
+cbl <- df$CBL
+summary(cbl)
+
+boxplot(cbl) # creates boxplot
+boxplot(df[, 5:12]) # boxplots of last eight columns of df.
+barplot(cbl) # creates barplot
+hist(cbl) # creates histogram
+plot(cbl) # creates scartterplot 
+
+# Let's check a categorical variable
+ssp <- table(df$Ssp) # tabulate the frequencies
+ssp
+```
+
+Based on these, answer the following:  
+
+1. What are the different columns in your data file? Which ones are numeric and 
+which are character?  
+```{r}
+# The different columns are: "ID" (character), "Sex" (character), "Total Body 
+#Length"(numeric), "Sub-species" (character), "CBL" (numeric), "LR" (numeric), 
+#"WZP" (numeric), "LLPTF" (numeric), "WLPTF" (numeric), "WEN" (numeric).
+```
+
+2. What is the mean per numeric variable? What are the minimum and maximum per 
+variable?  
+```{r}
+# TBL: Mean - 304.5, Min - 255.0, Max - 366.0
+# CBL: Mean - 558.5, Min - 495.0, Max - 608.0
+# LR: Mean - 311.3, Min - 268.6, Max - 351.1
+# WZP: Mean - 284.9, Min - 255.0, Max - 320.8
+# LLPTF: Mean - 122.6, Min - 106.4, Max - 140.6
+# WLPTF: Mean - 89.04, Min - 76.33, Max - 101.98
+# WEN: Mean - 65.26, Min - 55.13, Max - 73.58
+# WIN: Mean - 81.59, Min - 66.30, Max - 99.21
+# LNSO: Mean - 37.86, Min - 19.04, Max - 74.40
+```
+
+3. Create one boxplot containing data for CBL, LR, and WZP.  
+```{r}
+# CBL, LR, and WZP Boxplot
+boxplot(df[5:7])
+```
+
+4. How many individuals do you have per subspecies?   
+```{r}
+# There are 31 gephyreus individuals and 23 truncatus individuals
+```
+
+#Stats  
+
+## Relationship and Correlation    
+
+```{r}
+# Let's investigate the relationship between two variables. For example:
+lr <- df$LR # Vector lr carries information about the variable "LR"
+plot(cbl, lr) # scatterplot of CBL vs LR
+
+# Now let's see this relationship based on the subspecies
+subsp <- as.factor(df$Ssp)
+
+plot(cbl, lr, col = subsp) # change colors based on Species
+legend("topleft", levels(subsp), fill = 1:2) # add legends on topleft
+
+# you can add a trend line in the graph by using the code below. The order is 
+#reversed as we need y ~ x.
+abline(lm(lr ~ cbl))
+
+# Let's quantitatively characterize the strength of the correlation using 
+#Pearson’s correlation coefficient. It ranges from -1 to 1. 
+#Zero means no linear correlation.
+cor.test(cbl, lr)
+
+```
+
+Based on these, answer the following:  
+5. How can you interpret the relationship between CBL and LR?  
+```{r}
+# There is a strong, positive correlation between CBL and LR in bottlenose 
+#dolphins
+```
+
+6. Create scartterplots investigating the following relationships (remember to 
+color by subspecies). You should also provide an interpretation for each graph:  
+a. CBL vs. WZP  
+```{r}
+wzp <- df$WZP # Assigns values to the vector wzp
+plot(cbl, wzp, col = subsp) # Changes color based on subspecies
+legend("topleft", levels(subsp), fill = 1:2) # Adds a legend to the top left
+abline(lm(wzp ~ cbl)) # Adds a trend line (reverse variable order to plot y ~ x)
+
+# There is a relatively moderate, positive correlation between CBL and WZP in 
+#bottlenose dolphins
+```
+
+b. LLPTF vs. WLPTF  
+```{r}
+llptf <- df$LLPTF # Assigns values to the vector llptf
+wlptf <- df$WLPTF # Assigns values to the vector wlptf
+plot(llptf, wlptf, col = subsp) # Changes color based on subspecies
+legend("topleft", levels(subsp), fill = 1:2) # Adds a legend to the top left
+abline(lm(wlptf ~ llptf)) # Adds a trend line (reverse variable order to plot y ~ x)
+
+# There is a relatively moderate, positive correlation between LLPTF and WLPTF 
+#in bottlenose dolphins
+```
+c. CBL vs. LNSO  
+```{r}
+cbl <- df$CBL # Assigns values to the vector cbl
+lnso <- df$LNSO # Assigns values to the vector lnso
+plot(cbl, lnso, col = subsp) # Changes color based on subspecies
+legend("topleft", levels(subsp), fill = 1:2) # Adds a legend to the top left
+abline(lm(lnso ~ cbl)) # Adds a trend line (reverse variable order to plot y ~ x)
+
+# There is a relatively moderate, negative correlation between CBL and LNSO in 
+#bottlenose dolphins
+```
+d. WIN vs. WEN  
+```{r}
+win <- df$WIN # Assigns values to the vector win
+wen <- df$WEN # Assigns values to the vector wen
+plot(win, wen, col = subsp) # Changes color based on subspecies
+legend("topleft", levels(subsp), fill = 1:2) # Adds a legend to the top left
+abline(lm(wen ~ win)) # Adds a trend line (reverse variable order to plot y ~ x)
+
+# There is a very weak, positive correlation between WIN and WEN in bottlenose 
+#dolphins
+```
+7. Calculate Pearson's correlation test for each one of the relationships above.  
+```{r}
+# A
+cor.test(cbl,wzp) # Calculates a correlation coefficient between -1 and 1
+# B
+cor.test(llptf,wlptf) # Calculates a correlation coefficient between -1 and 1
+# C
+cor.test(cbl,lnso) # Calculates a correlation coefficient between -1 and 1
+# D
+cor.test(win,wen) # Calculates a correlation coefficient between -1 and 1
+```
+
+## Testing the differences between two groups  
+
+```{r}
+# Checks if the data follow a normal distribution based on a Q-Q 
+#(quantile-quantile) plot and histogram
+qqnorm(cbl) # Q-Q plot for normal distribution
+qqline(cbl) # add the regression line
+hist(cbl) # histogram
+
+# We can perform a hypothesis test on whether a set of numbers are derived from 
+#normal distribution. Our null hypothesis is that the data is from a normal 
+#distribution.
+shapiro.test(cbl)
+```
+
+Based on these, answer the following:  
+8. Does the variable CBL follow a normal distribution (based on a significant 
+level alpha = 0.05)?   
+```{r}
+# The variable CBL does not follow a normal distribution, as the calculated 
+#p-value of 0.2843 is much greater than the significance level of 0.05.
+```
+9. What about the other numerical variables? Remember to show the Q-Q plots and 
+the Shapiro test for each numerical variable   
+### TBL
+```{r}
+tbl <- df$TBL # Assigns values to the vector tbl
+qqnorm(tbl) # Q-Q plot for normal distribution
+qqline(tbl) # add the regression line
+hist(tbl) # histogram
+shapiro.test(tbl) # Shapiro test for normality
+# Calculated p-value of 0.1344 is greater than the alpha value, so the variable 
+#TBL does not follow a normal distribution.
+```
+### LR
+```{r}
+# LR
+qqnorm(lr) # Q-Q plot for normal distribution
+qqline(lr) # add the regression line
+hist(lr) # histogram
+shapiro.test(lr) # Shapiro test for normality
+# Calculated p-value of 0.0711 is greater than the alpha value, so the variable 
+#LR does not follow a normal distribution.
+```
+### WZP
+```{r}
+# WZP
+qqnorm(wzp) # Q-Q plot for normal distribution
+qqline(wzp) # add the regression line
+hist(wzp) # histogram
+shapiro.test(wzp) # Shapiro test for normality
+# Calculated p-value of 0.2615 is greater than the alpha value, so the variable 
+#LR does not follow a normal distribution.
+```
+### LLPTF
+```{r}
+# LLPTF
+qqnorm(llptf) # Q-Q plot for normal distribution
+qqline(llptf) # add the regression line
+hist(llptf) # histogram
+shapiro.test(llptf) # Shapiro test for normality
+# Calculated p-value of 0.7388 is greater than the alpha value, so the variable 
+#LLPTF does not follow a normal distribution.
+```
+### WLPTF
+```{r}
+# WLPTF
+qqnorm(wlptf) # Q-Q plot for normal distribution
+qqline(wlptf) # add the regression line
+hist(wlptf) # histogram
+shapiro.test(wlptf) # Shapiro test for normality
+# Calculated p-value of 0.02911 is less than the alpha value, so the variable 
+#WLPTF does follow a normal distribution.
+```
+### WEN
+```{r}
+# WEN
+qqnorm(wen) # Q-Q plot for normal distribution
+qqline(wen) # add the regression line
+hist(wen) # histogram
+shapiro.test(wen) # Shapiro test for normality
+# Calculated p-value of 0.9723 is greater than the alpha value, so the variable 
+#WEN does not follow a normal distribution.
+```
+### WIN
+```{r}
+# WIN
+qqnorm(win) # Q-Q plot for normal distribution
+qqline(win) # add the regression line
+hist(win) # histogram
+shapiro.test(win) # Shapiro test for normality
+# Calculated p-value of 0.6166 is greater than the alpha value, so the variable 
+#WIN does not follow a normal distribution.
+```
+### LNSO
+```{r}
+# LNSO
+qqnorm(lnso) # Q-Q plot for normal distribution
+qqline(lnso) # add the regression line
+hist(lnso) # histogram
+shapiro.test(lnso) # Shapiro test for normality
+# Calculated p-value of 0.0012 is less than the alpha value, so the variable 
+#LNSO does follow a normal distribution.
+```
+
+
+
+Let's check the difference between two groups  
+ 
+```{r}
+# Create a boxplot for a variable separating by subspecies. For example:
+boxplot(cbl ~ subsp)
+```
+
+Based on these, answer the following:  
+10. Create boxplots for each numerical variable but at this time differentiating 
+the subspecies.  
+```{r}
+# TBL
+boxplot(tbl ~ subsp)
+# CBL
+boxplot(cbl ~ subsp)
+# LR
+boxplot(lr ~ subsp)
+# WZP
+boxplot(wzp ~ subsp)
+# LLPTF
+boxplot(llptf ~ subsp)
+# WLPTF
+boxplot(wlptf ~ subsp)
+# WEN
+boxplot(wen ~ subsp)
+# WIN
+boxplot(win ~ subsp)
+# LNSO
+boxplot(lnso ~ subsp)
+```
+
+11. Based on the boxplots above, which variables seem to have a difference 
+between the subspecies?  
+```{r}
+# CBL, LR, WEN, and LNSO all seem to have differences between the subspecies.
+```
+
+12. Divide you data in two groups (*gephyreus* vs. *truncatus*) for the variable 
+CBL (using the example above or an alternative way). What can we conclude from 
+the t-test results (based on a significant level alpha = 0.05)?  
+
+```{r}
+# Assigns data to separate groups based on subspecies
+cbl.G1 <- cbl[df$Ssp == "gephyreus"]
+cbl.G2 <- cbl[df$Ssp == "truncatus"]
+# Run two sample t-test
+t.test(cbl.G1, cbl.G2)
+
+# We can conclude that there is a significant difference in CBL means based on 
+#subspecies, as the p-value for the two sample t-test was nearly 0.
+```
+
+13. There is a much easier way to inform R what are the groups without separating 
+them in different vectors. Can you figure out how? 
+Tip: look how we run the boxplot per subspecies. You use similar approach with 
+the function t.test. Based on this, run t-tests for all the numerical variables 
+that follow a normal distribution. Interpret your results.      
+```{r}
+# LR
+t.test(lr ~ subsp)
+# WEN
+t.test(wen ~ subsp)
+# LNSO
+t.test(lnso ~ subsp)
+
+# There is a significant difference in mean LR, WEN, and LNSO between subspecies 
+#in bottlenose dolphins. All the p-values calculated with the two sample t-test 
+#were below the significance value of 0.05.
+```
+
+
+
+## Testing the differences among multiple groups   
+Now we are interested in exploring differences among groups based on subspecies 
+and sex. To do this we will run an Analysis of Variance (ANOVA).  
+
+```{r}
+# To start we will need to separate the groups based on subspecies AND sex. 
+#You can do this by using the code below:
+
+df$Ssp_Sex<- with(df, paste0(Ssp, Sex))
+
+#Creates a new data.frame by removing any line with the value truncatusU.
+
+df.2<-subset(df, !Ssp_Sex %in% 'truncatusU')
+
+# Now we can run ANOVA for each numerical variable. For example:
+summary(aov(CBL ~ Ssp_Sex, data = df.2))
+
+# You can also use a boxplot to better investigate which group(s) has/have a 
+#difference in mean (if any)
+boxplot(CBL ~ Ssp_Sex, data = df.2)
+```
+
+Based on these, answer the following:  
+14. How many samples we have in our new data.frame?
+```{r}
+df.2 # Views the new data frame
+# There are now 41 samples in the data frame
+```
+
+15. What can we conclude from the ANOVA results based on the variable CBL 
+(based on a significant level alpha = 0.05)?  
+```{r}
+# We can conclude that there is a significant difference in average CBL based on 
+#subspecies and sex. The calculated p-value was far below the required 
+#significance level of 0.05.
+```
+
+16. Run ANOVA and create boxplot for each numerical variable. Interpret your 
+results.  
+```{r}
+# TBL
+boxplot(TBL ~ Ssp_Sex, data = df.2)
+summary(aov(TBL ~ Ssp_Sex, data = df.2))
+# LR
+boxplot(LR ~ Ssp_Sex, data = df.2)
+summary(aov(LR ~ Ssp_Sex, data = df.2))
+# WZP
+boxplot(WZP ~ Ssp_Sex, data = df.2)
+summary(aov(WZP ~ Ssp_Sex, data = df.2))
+# LLPTF
+boxplot(LLPTF ~ Ssp_Sex, data = df.2)
+summary(aov(LLPTF ~ Ssp_Sex, data = df.2))
+# WLPTF
+boxplot(WLPTF ~ Ssp_Sex, data = df.2)
+summary(aov(WLPTF ~ Ssp_Sex, data = df.2))
+# WEN
+boxplot(WEN ~ Ssp_Sex, data = df.2)
+summary(aov(WEN ~ Ssp_Sex, data = df.2))
+# WIN
+boxplot(WIN ~ Ssp_Sex, data = df.2)
+summary(aov(WIN ~ Ssp_Sex, data = df.2))
+# LNSO
+boxplot(LNSO ~ Ssp_Sex, data = df.2)
+summary(aov(LNSO ~ Ssp_Sex, data = df.2))
+
+# There are significant differences in mean LR, WZP, LLPTF, WEN, and LNSO based 
+#on both subspecies and sex. The variables TBL, WLPTF, and WIN did not show any 
+#significant differences.
+```
+
+## Dealing with missing data   
+
+```{r}
+# Replace "missvar" with the name of the variable with missing data.
+# TBL had missing data
+MISSING <- is.na(df.2$TBL)
+
+sum(MISSING) # Count the number of rows flagged for deletion
+
+df.3 <- subset(df.2, subset = !MISSING) # Create new data frame without NAs
+
+# Check for missing values again to make sure df.3 is with no NAs. If there is 
+#no missing data, run t-test and ANOVA for the variable that previously had 
+#missing data. 
+t.test(tbl ~ subsp)
+boxplot(tbl ~ subsp)
+summary(aov(TBL ~ Ssp_Sex, data = df.3))
+boxplot(TBL ~ Ssp_Sex, data = df.3)
+```
+
+Based on these new tests, answer the following: 
+17. Did the results change after removing the NAs for this variable? Explain. 
+Remember to also check the boxplots.     
+```{r}
+# The result of the t-test were different, as the new p-value of 0.0068 was 
+#below the significance value and showed that there was a difference between the 
+#mean TBL values based on subspecies alone.
+# The result of the ANOVA test was the same, however, showing that when 
+#subspecies and sex were both considered, there was no significant difference 
+#in TBL.
+```
+
+
+## Visualization    
+
+Let's start by installing the ggplot2 package in RStudio:   
+
+
+Once the package is installed, you will need to load the package in RStudio to 
+start using its functions:   
+
+```{r}
+#load package
+library(ggplot2) # load the ggplot2 package
+```
+
+Let's start creating our pretty graphs. Let's first create a nice boxplot.   
+
+```{r}
+ggplot(data = df) + # define a canvas
+  aes(x = subsp, y = cbl, color = subsp) + # map data to x and y coordinates, 
+                                          #and change color based on subspecies
+  geom_boxplot() + # create boxplot
+  geom_jitter(position = position_jitter(0.2)) # add another layer representing 
+#the raw data points for each subspecies. Since lining up data points on a 
+#straight line is hard to see, we jittered the relative x-position within each 
+#subspecies randomly.
+```
+
+We can also create density plots:   
+
+```{r}
+# One single plot with both subspecies
+ggplot(data = df) +
+  aes(x = cbl, fill = subsp) +
+  geom_density(alpha = 0.3)
+
+# One plot for each subspecies (one plot per line)
+ggplot(data = df) +
+  aes(x = cbl, fill = subsp) +
+  geom_density(alpha = 0.3) +
+  facet_wrap(~Ssp, nrow = 2) # need to use the name of variable as it shows in 
+#the data frame
+
+```
+
+Based on the code above using the package ggplot:   
+18. Create a boxplot for the variable TBL taking into consideration the 
+subspecies and sex information.  
+```{r}
+ggplot(data = df) + # defines a canvas
+  aes(x = subsp, y = tbl, color = subsp) + # maps data to x and y coordinates, 
+#and changes color #based on subspecies
+  geom_boxplot() + # creates a boxplot
+  geom_jitter(position = position_jitter(0.2)) # adds another layer representing 
+#the raw data points for each subspecies.
+```
+
+
+19. Create density plots for the variable TBL taking into consideration the 
+subspecies and sex information. You should do one density plot with all groups 
+in one single plot and another with one plot for each group (one plot per line).    
+```{r}
+# Creates one single plot with both subspecies
+ggplot(data = df) +
+  aes(x = tbl, fill = subsp) +
+  geom_density(alpha = 0.3)
+
+# Creates one plot for each subspecies (one plot per line)
+ggplot(data = df) +
+  aes(x = tbl, fill = subsp) +
+  geom_density(alpha = 0.3) +
+  facet_wrap(~Ssp, nrow = 2)
+```
+
+
+#########    
+
+**LENGTH-AT-AGE**   
+
+We will now learn basic length-at-age analyses to investigate growth pattern. 
+For this analysis, we will use data available in R package AquaticLifeHistory. 
+This data set contains length-at-age data for common blacktip sharks 
+(*Carcharhinus limbatus*) from Indonesia    
+
+# Visualization   
+
+Let's start by installing the package and/or loading the library and then 
+loading the data in RStudio.  
+
+```{r}
+library(AquaticLifeHistory)
+
+data("growth_data") # your data frame is now called growth_data
+```
+
+Now that you have our data frame:   
+20. Investigate the data frame. 
+```{r}
+growth_data
+```
+
+a. How many individuals do you have in this data? How many are females and 
+how many are males?   
+```{r}
+summary(growth_data) # Provides a summary of the data frame
+# There are a total of 294 sharks, with 127 females ad 167 males.
+```
+
+b. What is the minimum and maximum age? What is the mean?  
+```{r}
+# The minimum age was 0 years old and the maximum was 17 years old. The average 
+#age was 5.6 years old.
+```
+
+c. What is the minimum and maximum length? What is the mean?  
+```{r}
+# The minimum length was 354.7 cm while the maximum length was 2,369.8 cm. The 
+#average length was 1,445.4 cm.
+```
+
+21. Create a graph showing the relationship between age and length for the 
+common blacktip sharks independent of the sex.  
+```{r}
+# Assign values to variables and plot
+age = growth_data$Age
+length = growth_data$Length
+plot(age, length)
+abline(lm(length ~ age)) # Adds a trendline
+```
+
+
+22. Create graphs showing the relationship between age and length for the 
+common blacktip sharks considering the sex information. You will need to create 
+one graph for each sex. Tip: For this question 22, it is easier if you use the 
+package ggplot2. You can create these plots using the commands we learned above 
+and the function geom_point()   
+```{r}
+ggplot(data = growth_data) +  # Presents the data frame
+  aes(x = Age, y = Length, color = Sex) +  # Assigns axes and creates color
+  #differential
+  geom_point() +  # Scatterplot
+  facet_wrap(~Sex)  # Makes sex the differentiating variable
+```
+
+
+# Growth Models   
+
+Now let's do a quick run to check what growth model best apply to this data set 
+using the function Estimate_growth() of the package AquaticLifeHistory.   
+
+The Estimate_growth() will return a list of parameter estimates for three 
+candidate models: the von Bertalanffy growth function (“VB”), Gompertz growth 
+function (“Gom”) and Logistic growth function (“Log”). The AIC results for each 
+model will also be returned as a list element, demonstrating which growth model 
+best fit the data. A plot will be printed with the growth curves for all 
+included models: length-at-age 95% confidence intervals will be produced for the 
+growth curve through bootstrapping with 1000 iterations being default.   
+
+```{r}
+Estimate_Growth(data = growth_data)
+# The best model according to Akaike Information Criterion (AIC) weight is the 
+#model with the lowest AIC score and the highest Akaike weight
+```
+
+Based on this run, answer the following:    
+
+23. What is the model that best fit the data? 
+```{r}
+# The model that best fits the data is the von Bertalanffy (VB) growth function
+#(lowest AIC difference and greatest weight).
+```
+
+24. Based on the best model and the data available, do you think it reached 
+asymptotic growth? If yes, when (age and length) does it reach asymptotic growth? 
+If no, what can you say about how they grow? 
+```{r}
+# I don't think the model shows asymptotic growth. The VB model, which was the 
+#best fitting for the data, still shows an increasing length with age, albeit
+#at a reduced rate. After about 8 years, the growth rate of blacktip sharks
+#does reduce, but in the age range provided by the data frame, the rate never
+#hits 0 (unless considering the other two models).
+```
+
+25. Based on the best model, we can predict that at age of five years old, the 
+common blacktips will be of what approximately length (in cm)? 
+```{r}
+# Based on the VB model, we can predict that at the age of five years old, a 
+#common blacktip shark will be approximately 1,450 - 1,500 cm in length.
+```
+
